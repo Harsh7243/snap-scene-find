@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,10 +10,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Menu, Search, User, Camera } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 export function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Placeholder - will be replaced with auth state
+  const { user, loading, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast.success("Logged out successfully");
+      navigate("/");
+    } catch (error) {
+      toast.error("Error logging out");
+    }
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-photo-dark-purple/80 backdrop-blur-md border-b border-white/10">
@@ -59,7 +72,9 @@ export function Navbar() {
             </Button>
           )}
 
-          {!isAuthenticated ? (
+          {loading ? (
+            <div className="w-24 h-8 bg-muted/20 animate-pulse rounded-md"></div>
+          ) : !user ? (
             <div className="flex items-center gap-2">
               <Link to="/login">
                 <Button variant="ghost" size="sm">
@@ -88,7 +103,7 @@ export function Navbar() {
                   <Link to="/settings" className="w-full">Settings</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <button className="w-full text-left" onClick={() => setIsAuthenticated(false)}>
+                  <button className="w-full text-left" onClick={handleSignOut}>
                     Logout
                   </button>
                 </DropdownMenuItem>

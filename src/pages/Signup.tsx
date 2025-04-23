@@ -1,11 +1,12 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 import {
   Card,
   CardContent,
@@ -22,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Camera } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Signup = () => {
   const [firstName, setFirstName] = useState("");
@@ -30,12 +32,40 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [accountType, setAccountType] = useState("client");
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { signUp } = useAuth();
+  const navigate = useNavigate();
   
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real application, handle signup with Supabase or another auth provider
-    console.log("Signup with:", { firstName, lastName, email, password, accountType });
-    // Redirect after signup
+    
+    if (!firstName || !lastName || !email || !password) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+    
+    if (!agreeTerms) {
+      toast.error("Please agree to the Terms of Service and Privacy Policy");
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      const { error } = await signUp(email, password);
+      
+      if (error) throw error;
+      
+      // Store additional user data in profiles table
+      // This will be completed in next steps
+      
+      toast.success("Account created successfully! Please check your email for verification.");
+      navigate("/login");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to create account");
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   return (
@@ -72,6 +102,7 @@ const Signup = () => {
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
                       required
+                      disabled={isLoading}
                     />
                   </div>
                   <div className="space-y-2">
@@ -84,6 +115,7 @@ const Signup = () => {
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
                       required
+                      disabled={isLoading}
                     />
                   </div>
                 </div>
@@ -99,6 +131,7 @@ const Signup = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    disabled={isLoading}
                   />
                 </div>
                 
@@ -113,6 +146,7 @@ const Signup = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    disabled={isLoading}
                   />
                   <p className="text-xs text-muted-foreground">
                     Password must be at least 8 characters long with a mix of letters, numbers, and symbols.
@@ -126,6 +160,7 @@ const Signup = () => {
                   <Select 
                     value={accountType} 
                     onValueChange={setAccountType}
+                    disabled={isLoading}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select account type" />
@@ -145,6 +180,7 @@ const Signup = () => {
                       setAgreeTerms(checked === true)
                     }
                     className="mt-1"
+                    disabled={isLoading}
                   />
                   <label
                     htmlFor="terms"
@@ -165,9 +201,9 @@ const Signup = () => {
                 <Button 
                   type="submit" 
                   className="w-full"
-                  disabled={!agreeTerms}
+                  disabled={!agreeTerms || isLoading}
                 >
-                  Create Account
+                  {isLoading ? "Creating Account..." : "Create Account"}
                 </Button>
                 <p className="text-center text-sm mt-4">
                   Already have an account?{" "}

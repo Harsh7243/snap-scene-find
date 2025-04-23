@@ -1,11 +1,12 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 import {
   Card,
   CardContent,
@@ -15,17 +16,38 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Camera } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { signIn } = useAuth();
+  const navigate = useNavigate();
   
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real application, handle login with Supabase or another auth provider
-    console.log("Login with:", { email, password, rememberMe });
-    // Redirect after login
+    
+    if (!email || !password) {
+      toast.error("Please enter both email and password");
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      const { error } = await signIn(email, password);
+      
+      if (error) throw error;
+      
+      toast.success("Logged in successfully");
+      navigate("/");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to log in");
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   return (
@@ -62,6 +84,7 @@ const Login = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    disabled={isLoading}
                   />
                 </div>
                 
@@ -81,6 +104,7 @@ const Login = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    disabled={isLoading}
                   />
                 </div>
                 
@@ -91,6 +115,7 @@ const Login = () => {
                     onCheckedChange={(checked) => 
                       setRememberMe(checked === true)
                     }
+                    disabled={isLoading}
                   />
                   <label
                     htmlFor="remember"
@@ -101,8 +126,8 @@ const Login = () => {
                 </div>
               </CardContent>
               <CardFooter className="flex flex-col">
-                <Button type="submit" className="w-full">
-                  Log In
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Logging in..." : "Log In"}
                 </Button>
                 <p className="text-center text-sm mt-4">
                   Don't have an account?{" "}
