@@ -61,6 +61,17 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Custom photography theme colors
+				photo: {
+					'dark-purple': '#1A1F2C',
+					'charcoal': '#403E43',
+					'dark-charcoal': '#221F26',
+					'blue': '#1EAEDB',
+					'purple': '#9b87f5',
+					'neutral': '#8E9196',
+					'light-gray': '#C8C8C9',
+					'overlay': '#000000e6'
 				}
 			},
 			borderRadius: {
