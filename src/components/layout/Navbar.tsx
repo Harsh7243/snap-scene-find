@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -75,12 +76,12 @@ export function Navbar() {
             <div className="w-24 h-8 bg-muted/20 animate-pulse rounded-md"></div>
           ) : !user ? (
             <div className="flex items-center gap-2">
-              <Link to="/login">
+              <Link to="/auth/login">
                 <Button variant="ghost" size="sm">
                   Log in
                 </Button>
               </Link>
-              <Link to="/signup">
+              <Link to="/auth/signup">
                 <Button size="sm">Sign up</Button>
               </Link>
             </div>
