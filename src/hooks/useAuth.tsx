@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { User, AuthError } from '@supabase/supabase-js';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client'; // Updated import path
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -9,12 +9,6 @@ export function useAuth() {
   const [error, setError] = useState<AuthError | null>(null);
 
   useEffect(() => {
-    // If Supabase is not configured, don't try to authenticate
-    if (!isSupabaseConfigured()) {
-      setLoading(false);
-      return;
-    }
-
     // Check for active session on component mount
     const checkSession = async () => {
       try {
@@ -54,10 +48,6 @@ export function useAuth() {
     loading,
     error,
     signIn: async (email: string, password: string) => {
-      if (!isSupabaseConfigured()) {
-        return { error: { message: 'Supabase is not configured' } as AuthError, data: { user: null, session: null } };
-      }
-      
       setLoading(true);
       const result = await supabase.auth.signInWithPassword({ email, password });
       if (result.error) setError(result.error);
@@ -65,10 +55,6 @@ export function useAuth() {
       return result;
     },
     signUp: async (email: string, password: string) => {
-      if (!isSupabaseConfigured()) {
-        return { error: { message: 'Supabase is not configured' } as AuthError, data: { user: null, session: null } };
-      }
-      
       setLoading(true);
       const result = await supabase.auth.signUp({ email, password });
       if (result.error) setError(result.error);
@@ -76,10 +62,6 @@ export function useAuth() {
       return result;
     },
     signOut: async () => {
-      if (!isSupabaseConfigured()) {
-        return { error: null };
-      }
-      
       setLoading(true);
       const result = await supabase.auth.signOut();
       if (result.error) setError(result.error);
