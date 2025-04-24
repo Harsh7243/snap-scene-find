@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 type AuthContextValue = ReturnType<typeof useAuth>;
 
@@ -9,6 +10,13 @@ export const AuthContext = React.createContext<AuthContextValue | undefined>(und
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const auth = useAuth();
+  
+  // Display error toast if Supabase connection fails
+  React.useEffect(() => {
+    if (auth.error) {
+      toast.error(`Authentication error: ${auth.error.message}`);
+    }
+  }, [auth.error]);
   
   return (
     <AuthContext.Provider value={auth}>
