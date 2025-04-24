@@ -11,8 +11,8 @@ import Categories from "./pages/Categories";
 import HowItWorks from "./pages/HowItWorks";
 import PhotographerDetail from "./pages/PhotographerDetail";
 import Booking from "./pages/Booking";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
+import LoginPage from "./pages/auth/LoginPage";
+import SignupPage from "./pages/auth/SignupPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,9 +31,8 @@ const App = () => (
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/photographer/:id" element={<PhotographerDetail />} />
             <Route path="/book/:id" element={<Booking />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/auth/login" element={<LoginPage />} />
+            <Route path="/auth/signup" element={<SignupPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
