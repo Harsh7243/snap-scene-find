@@ -33,10 +33,17 @@ const SignupPage = () => {
     const accountType = formData.get("accountType") as string;
     
     try {
-      const { error: signUpError } = await signUp(email, password);
+      // First, sign up the user
+      const { data: authData, error: signUpError } = await signUp(email, password);
       if (signUpError) throw signUpError;
       
+      if (!authData.user) {
+        throw new Error("Failed to create user account");
+      }
+      
+      // Then create the profile with the user_id from the auth data
       const { error: profileError } = await supabase.from("profiles").insert({
+        user_id: authData.user.id,
         first_name: firstName,
         last_name: lastName,
         account_type: accountType,
