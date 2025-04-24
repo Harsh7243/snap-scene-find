@@ -2,14 +2,19 @@
 import { createClient } from '@supabase/supabase-js';
 
 // These environment variables are automatically available when using the Lovable Supabase integration
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
+// Log warning for missing credentials
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error('Supabase credentials missing. Make sure you have connected your Lovable project to Supabase.');
 }
 
+// Even with empty strings, createClient won't throw at initialization time
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Provide a helper function to check if Supabase is properly configured
+export const isSupabaseConfigured = () => Boolean(supabaseUrl && supabaseAnonKey);
 
 export type Profile = {
   id: string;
