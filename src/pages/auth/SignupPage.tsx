@@ -42,21 +42,27 @@ const SignupPage = () => {
         throw new Error("Failed to create user account");
       }
 
-      // Then create the profile
+      // Store user metadata in Supabase profiles table
       const { error: profileError } = await supabase
         .from('profiles')
-        .insert({
-          user_id: authData.user.id,
-          first_name: firstName,
-          last_name: lastName,
-          account_type: accountType
-        });
+        .insert([
+          {
+            user_id: authData.user.id,
+            first_name: firstName,
+            last_name: lastName,
+            account_type: accountType
+          }
+        ]);
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error("Profile creation error:", profileError);
+        throw new Error(`Error creating profile: ${profileError.message}`);
+      }
       
       toast.success("Account created! Please check your email to confirm your account.");
       navigate("/auth/login");
     } catch (error: any) {
+      console.error("Signup error:", error);
       toast.error(error.message || "Error creating account");
     } finally {
       setIsLoading(false);
