@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client"; // Updated import path
+import { supabase } from "@/integrations/supabase/client";
 import AuthLayout from "@/components/auth/AuthLayout";
 
 const SignupPage = () => {
@@ -33,22 +33,25 @@ const SignupPage = () => {
     const accountType = formData.get("accountType") as string;
     
     try {
-      // First, sign up the user
+      // First, sign up the user with Supabase Auth
       const { data: authData, error: signUpError } = await signUp(email, password);
+      
       if (signUpError) throw signUpError;
       
       if (!authData.user) {
         throw new Error("Failed to create user account");
       }
-      
-      // Then create the profile with the user_id from the auth data
-      const { error: profileError } = await supabase.from("profiles").insert({
-        user_id: authData.user.id,
-        first_name: firstName,
-        last_name: lastName,
-        account_type: accountType,
-      });
-      
+
+      // Then create the profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          user_id: authData.user.id,
+          first_name: firstName,
+          last_name: lastName,
+          account_type: accountType
+        });
+
       if (profileError) throw profileError;
       
       toast.success("Account created! Please check your email to confirm your account.");
