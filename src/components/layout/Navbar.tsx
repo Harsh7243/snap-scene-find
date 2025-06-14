@@ -23,7 +23,8 @@ export function Navbar() {
       await signOut();
       toast.success("Logged out successfully");
       navigate("/");
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Logout error:", error);
       toast.error("Error logging out");
     }
   };
